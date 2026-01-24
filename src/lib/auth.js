@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 
 export const authOptions = {
     adapter: PrismaAdapter(prisma),
-    sesssion: {
+    session: {
         strategy: 'jwt'
     },
     pages:{
@@ -21,7 +21,7 @@ export const authOptions = {
         // whenever any jwt is created or updated this function runs
         async jwt({ token, user }){
             if(user){
-                const dbUser = prisma.user.findUnique({
+                const dbUser = await prisma.user.findUnique({
                     where: {email:user.email},
                     select: { id:true, name:true ,email: true, username: true, image: true, role:true}
                 })

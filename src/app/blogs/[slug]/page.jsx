@@ -1,36 +1,63 @@
 import dateFormat from "@/utils/dateFormat";
 import { Calendar } from "lucide-react";
 import Image from "next/image";
+import "../../../style/blog.css";
 
-export default function SingleBlog(){
+const fetchSingleBlog = async (slug)=>{
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/get/${slug}`).then(value => value.json());
+
+    return res;
+}
+
+export async function generateMetadata({ params }){
+    const { slug } = await params;
+    const post = await fetchSingleBlog(slug);
+    return {
+        title: post.title,
+        description: post.desc,
+        openGraph:{
+            images:[post.thumbnail]
+        }
+    }
+}
+
+export default async function SingleBlog({ params }){
+
+    const { slug } = await params;
+    const post = await fetchSingleBlog(slug);
+    // console.log(post);
+
     const tempTags = "SpaceX, Nasa, Exploration"
     const tempHtml = `<p>Demo Content</p>
     <h2>Demo Heading</h2>
     `
     return (
         <section>
-            <div className="flex flex-col gap-5 items-center py-2 ">
-                <Image className="rounded shadow shadow-zinc-600 w-[90%] md:w-[700px]" src={"https://miro.medium.com/1*7XkV_Y7RIq3u-gbbTMTBRg.png"} width={600} height={300} alt="Blog Cover Image"/>
-                <div className="meta-of-a-blog space-y-2">
+            <div className="flex flex-col gap-5 items-center py-2 px-4">
+                {post.thumbnail && <Image unoptimized className="rounded shadow shadow-zinc-300 w-[90%] md:w-[700px]" src={post.thumbnail} width={600} height={300} alt={post.title}/>}
+                <h1 className="text-2xl md:text-4xl font-bold">{post.title}</h1>
+                <div className="meta-of-a-blog w-[90%] md:w-2/3 space-y-2">
                     <div className="flex gap-2 items-center">
                         <Calendar className="text-gray-400 size-4"/>
-                        <p className="text-gray-400 text-xs">Created on: {dateFormat(new Date())}</p>
+                        <p className="text-gray-400 text-xs">Created on: {dateFormat(post.createdAt)}</p>
                     </div>
                     <div className="text-xs flex items-center gap-2">
                         <p>Categories:</p>
-                        <p className="badge bg-gray-600/30 border border-gray-600 w-fit px-2 py-1 rounded">Space exploration</p>
+                        <p className="badge bg-gray-600/30 border border-gray-600 w-fit px-2 py-1 rounded">{post.catSlug}</p>
                     </div>
-                    <div className="text-xs flex items-center gap-2">
-                        <p>Tags:</p>
-                        {
-                            tempTags.split(",").map((tag,index) =>(
-                                <p className="badge font-bold bg-gray-600/30 border border-gray-600 w-fit px-2 py-1 rounded" key={index}>{tag}</p>
-                            ))
-                        }
-                    </div>
+                    { post.keywords && <div className="text-xs flex gap-2">
+                        <p className="pt-1">Tags:</p>
+                        <div className="flex flex-wrap gap-2">
+                            {
+                                post.keywords.split(",").map((tag,index) =>(
+                                    <p className="badge font-bold bg-gray-600/30 border border-gray-600 w-fit px-2 py-1 rounded flex-nowrap" key={index}>{tag}</p>
+                                ))
+                            }
+                        </div>
+                    </div>}
                 </div>
-                {/* <div className="content" dangerouslySetInnerHTML={{__html:tempHtml}}></div> */}
-                <div className="w-[90%] md:w-2/3" >
+                <div className="blogContent w-[90%] md:w-2/3 text-sm text-gray-300" dangerouslySetInnerHTML={{__html:post.content}}></div>
+                {/* <div className="w-[90%] md:w-2/3" >
                     <p className="text-sm text-gray-300">
                         Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
                         <br/>
@@ -40,8 +67,8 @@ export default function SingleBlog(){
                         <br/>
                         Voluptatibus doloremque exercitationem numquam perspiciatis saepe autem enim, aut aspernatur corporis debitis nemo sed totam repellendus aliquam cupiditate eaque? Itaque possimus in tempora deleniti consequatur hic voluptatum, ut numquam voluptate quod, id esse labore, vitae maiores molestias consectetur similique enim praesentium laudantium beatae aspernatur! Fugit quis inventore, nisi cupiditate laboriosam at totam.
                     </p>
-                </div>
-            </div>
+                </div> */}
+            </div> 
         </section>
     )
 }

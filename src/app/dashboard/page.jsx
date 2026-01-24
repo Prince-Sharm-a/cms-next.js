@@ -1,6 +1,5 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { authOptions, getAuthSession } from "@/lib/auth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -10,7 +9,7 @@ export default function Dashboard(){
     useEffect(()=>{
         toast.promise(async ()=>{
             try{
-                const sess = await fetch("http://localhost:3000/api/getAuth").then(data=>data.json());
+                const sess = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/getAuth`).then(data=>data.json());
                 // console.log("user",sess?.user)
                 setUser(sess?.user)  
                 return sess;              
@@ -20,7 +19,7 @@ export default function Dashboard(){
             }
         },{
             loading:"Loading........",
-            success:(sess)=> sess ?`Hi, ${sess?.user.name} You Successfully Logged In`: `Hey Welcome to GeekForGeek CMS`,
+            success:(sess)=> sess ?`Hi, ${sess?.user.name} You have Successfully Logged In`: `Hey Welcome to GeekForGeek CMS`,
             error:"Error"
         }
     )

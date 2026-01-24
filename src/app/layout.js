@@ -37,9 +37,9 @@ export default function RootLayout({ children }) {
         <SidebarProvider>
           <AppSidebar />
           <main className="w-full">
-            <Toaster />
+            <Toaster position="top-center" />
             <div className="flex">
-              <SidebarTrigger />
+              <SidebarTrigger className="pt-2.5 pl-2 size-8" />
               <Navbar />
             </div>
             {children}
